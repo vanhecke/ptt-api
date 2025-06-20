@@ -17,19 +17,40 @@ def test_health():
     print()
 
 def test_parse_single():
-    """Test single parse endpoint"""
-    print("Testing single parse endpoint...")
+    """Test single parse endpoint (GET)"""
+    print("Testing single parse endpoint (GET)...")
     title = "The.Simpsons.S01E01.1080p.BluRay.x265.HEVC.10bit.AAC.5.1.Tigole"
     response = requests.get(f"{BASE_URL}/parse", params={"title": title})
     print(f"Status: {response.status_code}")
     print(f"Response: {json.dumps(response.json(), indent=2)}")
     print()
+    
+def test_parse_single_post():
+    """Test single parse endpoint (POST)"""
+    print("Testing single parse endpoint (POST)...")
+    title = "The.Simpsons.S01E01.1080p.BluRay.x265.HEVC.10bit.AAC.5.1.Tigole"
+    response = requests.post(f"{BASE_URL}/parse", json={"title": title})
+    print(f"Status: {response.status_code}")
+    print(f"Response: {json.dumps(response.json(), indent=2)}")
+    print()
 
 def test_parse_simple():
-    """Test simple parse endpoint"""
-    print("Testing simple parse endpoint...")
+    """Test simple parse endpoint (GET)"""
+    print("Testing simple parse endpoint (GET)...")
     title = "The.Walking.Dead.S06E07.SUBFRENCH.HDTV.x264-AMB3R.mkv"
     response = requests.get(f"{BASE_URL}/parse-simple", params={
+        "title": title,
+        "translate_languages": True
+    })
+    print(f"Status: {response.status_code}")
+    print(f"Response: {json.dumps(response.json(), indent=2)}")
+    print()
+    
+def test_parse_simple_post():
+    """Test simple parse endpoint (POST)"""
+    print("Testing simple parse endpoint (POST)...")
+    title = "The.Walking.Dead.S06E07.SUBFRENCH.HDTV.x264-AMB3R.mkv"
+    response = requests.post(f"{BASE_URL}/parse-simple", json={
         "title": title,
         "translate_languages": True
     })
@@ -68,7 +89,9 @@ if __name__ == "__main__":
     try:
         test_health()
         test_parse_single()
+        test_parse_single_post()
         test_parse_simple()
+        test_parse_simple_post()
         test_batch_parse()
         test_examples()
         print("All tests completed successfully!")

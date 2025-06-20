@@ -50,8 +50,10 @@ docker run -p 12000:12000 ptt-api
 
 - **`GET /`** - Interactive API documentation (Swagger UI)
 - **`GET /health`** - Health check endpoint
-- **`GET /parse`** - Parse a single torrent title (structured response)
-- **`GET /parse-simple`** - Parse a single torrent title (raw response)
+- **`GET /parse`** - Parse a single torrent title (structured response) using GET
+- **`POST /parse`** - Parse a single torrent title (structured response) using POST
+- **`GET /parse-simple`** - Parse a single torrent title (raw response) using GET
+- **`POST /parse-simple`** - Parse a single torrent title (raw response) using POST
 - **`POST /parse-batch`** - Parse multiple torrent titles in batch
 - **`GET /examples`** - Get example torrent titles and their parsed results
 
@@ -59,7 +61,7 @@ docker run -p 12000:12000 ptt-api
 
 #### `GET /parse`
 
-Parse a torrent title and return structured data with success/error handling.
+Parse a torrent title and return structured data with success/error handling using GET method.
 
 **Parameters:**
 - `title` (required): The torrent title to parse
@@ -68,6 +70,28 @@ Parse a torrent title and return structured data with success/error handling.
 **Example:**
 ```bash
 curl "http://localhost:12000/parse?title=The.Simpsons.S01E01.1080p.BluRay.x265.HEVC.10bit.AAC.5.1.Tigole"
+```
+
+#### `POST /parse`
+
+Parse a torrent title and return structured data with success/error handling using POST method.
+
+**Request Body:**
+```json
+{
+  "title": "The.Simpsons.S01E01.1080p.BluRay.x265.HEVC.10bit.AAC.5.1.Tigole",
+  "translate_languages": false
+}
+```
+
+**Example:**
+```bash
+curl -X POST "http://localhost:12000/parse" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "The.Simpsons.S01E01.1080p.BluRay.x265.HEVC.10bit.AAC.5.1.Tigole",
+    "translate_languages": false
+  }'
 ```
 
 **Response:**
@@ -93,7 +117,7 @@ curl "http://localhost:12000/parse?title=The.Simpsons.S01E01.1080p.BluRay.x265.H
 
 #### `GET /parse-simple`
 
-Parse a torrent title and return the raw parsed data directly.
+Parse a torrent title and return the raw parsed data directly using GET method.
 
 **Parameters:**
 - `title` (required): The torrent title to parse
@@ -102,6 +126,28 @@ Parse a torrent title and return the raw parsed data directly.
 **Example:**
 ```bash
 curl "http://localhost:12000/parse-simple?title=The.Walking.Dead.S06E07.SUBFRENCH.HDTV.x264-AMB3R.mkv&translate_languages=true"
+```
+
+#### `POST /parse-simple`
+
+Parse a torrent title and return the raw parsed data directly using POST method.
+
+**Request Body:**
+```json
+{
+  "title": "The.Walking.Dead.S06E07.SUBFRENCH.HDTV.x264-AMB3R.mkv",
+  "translate_languages": true
+}
+```
+
+**Example:**
+```bash
+curl -X POST "http://localhost:12000/parse-simple" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "The.Walking.Dead.S06E07.SUBFRENCH.HDTV.x264-AMB3R.mkv",
+    "translate_languages": true
+  }'
 ```
 
 **Response:**
