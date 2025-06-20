@@ -4,10 +4,10 @@ PTT API Web Service
 A FastAPI web service that wraps around the PTT (parsett) library for parsing torrent titles.
 """
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 import logging
 
@@ -67,6 +67,11 @@ class BatchParseResponse(BaseModel):
     success: bool
     results: List[ParseResponse]
     total_processed: int
+    
+class ParseRequest(BaseModel):
+    """Request model for parse endpoint"""
+    title: str = Field(..., description="The torrent title to parse", min_length=1)
+    translate_languages: bool = Field(False, description="Whether to translate language codes to full names")
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -78,16 +83,42 @@ async def health_check():
     )
 
 @app.get("/parse", response_model=ParseResponse)
-async def parse_torrent_title(
+async def parse_torrent_title_get(
     title: str = Query(..., description="The torrent title to parse", min_length=1),
     translate_languages: bool = Query(False, description="Whether to translate language codes to full names")
 ):
     """
-    Parse a torrent title and return structured data.
+    Parse a torrent title and return structured data (GET method).
     
     Args:
         title: The torrent title to parse
         translate_languages: Whether to translate language codes to full names (default: False)
+    
+    Returns:
+        ParseResponse: Structured data extracted from the torrent title
+    """
+    return await _parse_torrent_title(title, translate_languages)
+
+@app.post("/parse", response_model=ParseResponse)
+async def parse_torrent_title_post(request: ParseRequest):
+    """
+    Parse a torrent title and return structured data (POST method).
+    
+    Args:
+        request: ParseRequest containing the title and options
+    
+    Returns:
+        ParseResponse: Structured data extracted from the torrent title
+    """
+    return await _parse_torrent_title(request.title, request.translate_languages)
+
+async def _parse_torrent_title(title: str, translate_languages: bool):
+    """
+    Internal function to parse a torrent title.
+    
+    Args:
+        title: The torrent title to parse
+        translate_languages: Whether to translate language codes to full names
     
     Returns:
         ParseResponse: Structured data extracted from the torrent title
@@ -115,16 +146,42 @@ async def parse_torrent_title(
         )
 
 @app.get("/parse-simple")
-async def parse_torrent_title_simple(
+async def parse_torrent_title_simple_get(
     title: str = Query(..., description="The torrent title to parse", min_length=1),
     translate_languages: bool = Query(False, description="Whether to translate language codes to full names")
 ):
     """
-    Parse a torrent title and return the raw result (simplified endpoint).
+    Parse a torrent title and return the raw result (simplified endpoint, GET method).
     
     Args:
         title: The torrent title to parse
         translate_languages: Whether to translate language codes to full names (default: False)
+    
+    Returns:
+        Dict: Raw structured data extracted from the torrent title
+    """
+    return await _parse_torrent_title_simple(title, translate_languages)
+
+@app.post("/parse-simple")
+async def parse_torrent_title_simple_post(request: ParseRequest):
+    """
+    Parse a torrent title and return the raw result (simplified endpoint, POST method).
+    
+    Args:
+        request: ParseRequest containing the title and options
+    
+    Returns:
+        Dict: Raw structured data extracted from the torrent title
+    """
+    return await _parse_torrent_title_simple(request.title, request.translate_languages)
+
+async def _parse_torrent_title_simple(title: str, translate_languages: bool):
+    """
+    Internal function to parse a torrent title and return the raw result.
+    
+    Args:
+        title: The torrent title to parse
+        translate_languages: Whether to translate language codes to full names
     
     Returns:
         Dict: Raw structured data extracted from the torrent title
